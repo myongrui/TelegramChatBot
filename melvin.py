@@ -5,15 +5,19 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 token: Final = '6502869678:AAGkKEFOjyuYSR-liD9aUF-3B3NLQbcula0'
 bot_username: Final = '@Melvin_Cares_Bot'
 
-GENDER, AGE, EDUCATION, STATUS, INCOME = range(5)
+GENDER, AGE, EDUCATION, STATUS = range(4)
+FI_INFO, CA_INFO, CONSULTATION = range(3)
 
 # Dictionary to store user answers
 user_answers = {}
-
+user_selections = {}
 # Commands
-async def chat_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('How may I help you today?')
-    await update.message.reply_text('Feature still under construction...')
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    profile = "📋 /profile: Use if you want to redo your profile questions. Data collected will only be used to curate the information we send you."
+    financial = "💵 /financial: If you wish to know about any ongoing or new financial assistance schemes from the government, this command will help."
+    activity = "🧗‍♂️ /activities: Use this command to find any activities or workshops near you. We will keep note of your interests and push out information accordingly."
+    consult = "👩‍⚕️ /consult: If you need a listening ear, someone to advice you on your personal problems or professional help/advice."
+    await update.message.reply_text(f'Below is a list of available commands you can use ⌨\n\n{profile}\n{financial}\n{activity}\n{consult}\n\nYou can also use this bot passively. We will alert you of any information that we deem helpful for youths from low-income families. Good Luck 😁')
 
 async def profile_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.message.chat_id
@@ -126,7 +130,7 @@ async def education(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     statusOptions = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text = f"You have chosen {query.data}")
-    await context.bot.send_message(chat_id = user_id, text = 'What is your immigrant status?', reply_markup=statusOptions)
+    await context.bot.send_message(chat_id = user_id, text = 'What is your citizenship status?', reply_markup=statusOptions)
     return STATUS
     
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -136,6 +140,22 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_answers[user_id]['status'] = query.data
     await query.answer()
 
+    await query.edit_message_text(text = f"You have chosen {query.data}")
+    await context.bot.send_message(chat_id = user_id, text = '''Thanks for answering the questions! We will send you information applicable to you. If at any time you need to update your profile, do /profile. All the best!''')
+    print(user_answers)
+    return ConversationHandler.END
+
+
+async def income(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    
+    query = update.callback_query
+    user_id = query.from_user.id
+    user_answers[user_id]['income'] = query.data
+    await query.answer()
+    
+async def finance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    
+    user_id = update.message.chat_id
     keyboard = [
         [
             InlineKeyboardButton("<$1,500", callback_data="<1500"),
@@ -150,33 +170,59 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             InlineKeyboardButton(">$5500", callback_data=">5500")
         ],
         [
-            InlineKeyboardButton("I don't know", callback_data="-")
+            InlineKeyboardButton("I don't know/Prefer not to say", callback_data="not sure")
         ]
     ]
 
     incomeOptions = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(text = f"You have chosen {query.data}")
-    await context.bot.send_message(chat_id = user_id, text = 'How much does your family earn in a month?', reply_markup=incomeOptions)
-    return INCOME
+    await context.bot.send_message(chat_id = user_id, text = 'How much does your family earn in a month? *This is used to curate more personalised suggestions for you based on income range, should you pick prefer not to say, information might not be tailored.*', reply_markup=incomeOptions)
+    return FI_INFO
+    
+async def activities(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
-async def income(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = update.message.chat_id
+    keyboard = [
+        [
+            InlineKeyboardButton("Sports", callback_data="sports"),
+            InlineKeyboardButton("Arts and Crafts", callback_data="arts and crafts"),    
+        ],
+        [
+            InlineKeyboardButton("Math and Science", callback_data="science and math"),
+            InlineKeyboardButton("Games", callback_data="games")
+        ],
+        [
+            InlineKeyboardButton("Computers or Internet of Things", callback_data="tech")
+        ]
+    ]
+
+    activitiesOptions = InlineKeyboardMarkup(keyboard)
+    await context.bot.send_message(chat_id = user_id, text = 'What activities do you want to know about?', reply_markup=activitiesOptions)
+    return CA_INFO
+
+async def consultation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+
+    user_id = update.message.chat_id
+    keyboard = [
+        [
+            InlineKeyboardButton("Financial", callback_data="financial"), 
+            InlineKeyboardButton("Personal", callback_data="personal"),
+            InlineKeyboardButton("Unsure", callback_data="unsure")
+        ]
+    ]
+
+    consultOptions = InlineKeyboardMarkup(keyboard)
+    await context.bot.send_message(chat_id = user_id, text = 'Hello! How may I help you today?', reply_markup=consultOptions)
+    return CONSULTATION
+
+async def finformation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     
     query = update.callback_query
     user_id = query.from_user.id
-    user_answers[user_id]['income'] = query.data
+    #user_answers[user_id]['income'] = query.data
     await query.answer()
     await query.edit_message_text(text = f"You have chosen {query.data}")
-    await context.bot.send_message(chat_id = user_id, text = '''Thanks for answering the questions! We will send you information applicable to you. If at any time you need to update your profile, do /profile. All the best!''')
-    print(user_answers)
-    return ConversationHandler.END
 
-async def information(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update.message.chat_id
-    link = 'https://supportgowhere.life.gov.sg/grants/scfaa'
-    image = 'CHAS.png'
-    text =  'The Community Health Assist Scheme (CHAS) in Singapore offers eligible individuals subsidized healthcare services, including reduced consultation fees and medication costs at participating general practitioners (GPs) and dental clinics. CHAS cardholders benefit from subsidized consultations for common illnesses and chronic conditions, medication subsidies, and additional support for managing chronic diseases. Dental services also receive subsidies, and some cardholders may be eligible for free health screenings.'
-    message = f"{text}\n\n{link}"
-    await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
+    await context.bot.send_message(chat_id=user_id, text="Here are some schemes I have found for now! If there is any more information regarding financial assistance, I will relay it to you. Have a good day ❤")
 
     link='https://go.gov.sg/moe-efas'
     image = 'FAS.jpg'
@@ -188,6 +234,53 @@ One of the following transport subsidies:
 Meal subsidy
     - 7 meals per school week for primary school students
     - 10 meals per school week for secondary school students'''
+    message = f"{text}\n\nApply here: {link}"
+    await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
+    return ConversationHandler.END
+
+async def actinformation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    
+    query = update.callback_query
+    user_id = query.from_user.id
+    await query.answer()
+    await query.edit_message_text(text = f"You have chosen {query.data}")
+    if query.data == "sports":
+        link = 'https://tinyurl.com/YGOSvball'
+        image = 'sports.jpg'
+        text =  'Youth Guidance Outreach Service is hosting volleyball lessons. If you are interested sign up below!'
+        message = f"{text}\n\nGoogle Forms: {link}"
+        await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
+        await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in sports. I will send more sport events and activities your way if I find some! ⚽🏀🏐😆")
+    elif query.data == "arts and crafts":
+        print()
+    elif query.data == "science and math":
+        print()
+    elif query.data == "games":
+        link = 'https://tinyurl.com/YGOSmlbb'
+        image = 'games.jpg'
+        text =  'Youth Guidance Outreach Service is hosting friendly matches for popular mobile game: Mobile Legends! If you are interested sign up below!'
+        message = f"{text}\n\nGoogle Forms: {link}"
+        await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
+        await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in games. I will send more gaming events and activities your way if I find some! 🎱🕹🎮😎")
+    elif query.data == "tech":
+        print()
+    
+    return ConversationHandler.END
+
+async def coninformation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+
+    query = update.callback_query
+    user_id = query.from_user.id
+    await query.answer()
+    await query.edit_message_text(text = f"You have chosen {query.data}")
+    await context.bot.send_message(chat_id=user_id, text="Currently the specialist we are connecting you to is unavailable... tbc in figma")
+    return ConversationHandler.END
+
+async def information(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.chat_id
+    link = 'https://supportgowhere.life.gov.sg/grants/scfaa'
+    image = 'CHAS.png'
+    text =  'The Community Health Assist Scheme (CHAS) in Singapore offers eligible individuals subsidized healthcare services, including reduced consultation fees and medication costs at participating general practitioners (GPs) and dental clinics. CHAS cardholders benefit from subsidized consultations for common illnesses and chronic conditions, medication subsidies, and additional support for managing chronic diseases. Dental services also receive subsidies, and some cardholders may be eligible for free health screenings.'
     message = f"{text}\n\n{link}"
     await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
 
@@ -205,14 +298,8 @@ if __name__ == '__main__':
     app = Application.builder().token(token).build()
  
     # Commands
-    app.add_handler(CommandHandler('chat', chat_command))
+    app.add_handler(CommandHandler('help', help))
     app.add_handler(CommandHandler('info', information))
-
-    # Messages
-    #app.add_handler(MessageHandler(filters.TEXT, handle_message))
-
-    # Errors
-    #app.add_error_handler(error)
 
     # Conversations
     profile_questions = ConversationHandler(
@@ -221,40 +308,27 @@ if __name__ == '__main__':
             GENDER: [CallbackQueryHandler(gender, pattern = "^" + "Male|Female|Ambiguous" + "$")],
             AGE: [CallbackQueryHandler(age, pattern = "^" + "6-12|13-16|17-18|19-21" + "$")],
             EDUCATION: [CallbackQueryHandler(education, pattern = "^" + "Primary|Secondary|Polytechnic|Junior College|ITE|University" + "$")],
-            STATUS: [CallbackQueryHandler(status, pattern= "^" + "Citizen|PR|Foreigner" + "$")],
-            INCOME:[CallbackQueryHandler(income, pattern = "^" + "<1500|1500-2499|2500-3499|3500-4499|4500-5500|>5500|-" + "$")]
+            STATUS: [CallbackQueryHandler(status, pattern= "^" + "Citizen|PR|Foreigner" + "$")]
         },
         fallbacks=[CommandHandler("start", start_command)],
     )
 
+    help_questions = ConversationHandler(
+        entry_points=[CommandHandler("financial", finance), CommandHandler("activities", activities), CommandHandler("consultation", consultation)],
+        states={
+            FI_INFO:[CallbackQueryHandler(finformation, pattern= "^" + "<1500|1500-2499|2500-3499|3500-4499|4500-5500|>5500|not sure" + "$")],
+            CA_INFO: [CallbackQueryHandler(actinformation, pattern= "^" + "sports|arts and crafts|science and math|games|tech" + "$")],
+            CONSULTATION: [CallbackQueryHandler(coninformation, pattern= "^" + "financial|personal|unsure" + "$")]
+        },
+        fallbacks=[CommandHandler("financial", finance)]
+    )
+
     app.add_handler(profile_questions)
+    app.add_handler(help_questions)
 
     #===============#
     print('Polling...')
     print(user_answers)
     app.run_polling(poll_interval=1, allowed_updates=Update.ALL_TYPES)
-
-
-# Responses
-
-# def handle_response(text: str) -> str:
-#     if 'hello'  in text:
-#         return 'Hey there'
-
-# async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     message_type: str  = update.message.chat.type
-#     text: str = update.message.reply_text
-
-#     print(f'User({update.message.chat.id}) in {message_type}: "{text}"')
-
-#     response: str = handle_response(text)
-
-#     print('Bot:', response)
-#     await update.message.reply_text(response)
-
-
-#async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#    print(f'Update {update} caused error {context.error}')
-
 
 
