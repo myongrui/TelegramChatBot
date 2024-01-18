@@ -10,7 +10,18 @@ FI_INFO, CA_INFO, CONSULTATION = range(3)
 
 # Dictionary to store user answers
 user_answers = {}
-user_selections = {}
+
+# conversation text
+fi_user_1 = "Bills are piling up, and I'm not sure how to manage everything on my own."
+fi_bot_1 = "I appreciate your honesty. It's not uncommon to feel overwhelmed, especially when facing financial challenges. Let's start by taking a closer look at your current financial situation. Can you share some details about your income, expenses, and any debts you might have?"
+fi_user_2 = "Well, I have a part-time job, but it doesn't cover all my expenses. I also have student loans and some credit card debt from a few months back."
+fi_bot_2 = "Thank you for sharing that. It's a good starting point. We can work together to create a budget that aligns with your income and helps you manage your expenses more effectively. Have you considered reaching out to any financial aid or assistance programs that might be available to you?"
+us_user_1 = "Hi. I've been feeling really overwhelmed lately. It's hard to keep up with everything."
+us_user_2 = "It's just this constant heaviness, you know? I can't shake off this weird feeling."
+us_user_3 = "It's like a weight on my chest, and I can't enjoy things like I used to. I think I started to notice this feeling few weeks back and now it's just on and off."
+us_bot_1 = "I appreciate you sharing that. I want you to know that I'm here for you, and we'll navigate this together. Can you tell me a bit more about what's been on your mind lately?"
+us_bot_2 = "It sounds like you're carrying a lot. Let’s try to unpack those feelings together. Can you describe what the heaviness feels like or when you first started noticing it?"
+
 # Commands
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     profile = "📋 /profile: Use if you want to redo your profile questions. Data collected will only be used to curate the information we send you."
@@ -141,7 +152,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await query.answer()
 
     await query.edit_message_text(text = f"You have chosen {query.data}")
-    await context.bot.send_message(chat_id = user_id, text = '''Thanks for answering the questions! We will send you information applicable to you. If at any time you need to update your profile, do /profile. All the best!''')
+    await context.bot.send_message(chat_id = user_id, text = '''Thanks for answering the questions! Data collected will only be used to curate the information we send you, nothing else. If at any time you need to update your profile, do /profile. All the best! 🙌🙌🙌''')
     print(user_answers)
     return ConversationHandler.END
 
@@ -205,7 +216,10 @@ async def consultation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     keyboard = [
         [
             InlineKeyboardButton("Financial", callback_data="financial"), 
-            InlineKeyboardButton("Personal", callback_data="personal"),
+            InlineKeyboardButton("Personal", callback_data="personal")
+        ],
+        [
+            InlineKeyboardButton("Education", callback_data="education"), 
             InlineKeyboardButton("Unsure", callback_data="unsure")
         ]
     ]
@@ -252,9 +266,19 @@ async def actinformation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
         await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in sports. I will send more sport events and activities your way if I find some! ⚽🏀🏐😆")
     elif query.data == "arts and crafts":
-        print()
+        link = 'https://www.eventbrite.sg/e/workshop-pinhole-camera-making-exploration-with-sroyon-mukherjee-tickets-796640050837?aff=ebdssbdestsearch'
+        image = 'arts.jpg'
+        text =  'oin Sroyon in a hands-on workshop to create your own pinhole camera and capture images of NUS Baba House\'s interior spaces on Instax film. The Baba House team will also give an architectural tour to introduce you to its history and contemporary significance. Participants get to keep their own pinhole cameras and the images captured.'
+        message = f"{text}\n\n{link}"
+        await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
+        await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in Arts (and Crafts). I will send more of such events and activities your way if I find some! 🎨🎭🧶🤩")
     elif query.data == "science and math":
-        print()
+        link = 'https://www.math.nus.edu.sg/events/outreach-activities/mathematics-enrichment-camp/'
+        image = 'science.jpg'
+        text =  'NUS are organizing a camp Mathematics Enrichment Camp. The Mathematics Enrichment Camp, organised by the Department of Mathematics, is an annual one-day event for students at the pre-university level. The camp consists of talks on various interesting mathematics topics and applications. Please click here for more details'
+        message = f"{text}\n\n{link}"
+        await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
+        await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in Science and Maths. I will send more of such events and activities your way if I find some! 🧮🔬🥼🤓")
     elif query.data == "games":
         link = 'https://tinyurl.com/YGOSmlbb'
         image = 'games.jpg'
@@ -263,7 +287,15 @@ async def actinformation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
         await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in games. I will send more gaming events and activities your way if I find some! 🎱🕹🎮😎")
     elif query.data == "tech":
-        print()
+        link = 'https://empirecode.co/march-and-april-camps/?gad_'
+        image = 'tech.jpg'
+        text =  '''Python with Data Analytics
+Ages 12 to 19(Available on campus only)
+With almost everything going digital, data is key to having a personalised service. By analysing data through Python, we can have insights by studying patterns and trends. Teenagers will learn the fundamentals of Data Visualisation to create powerful interpretations with Machine Learning. Prior experience in Python is required'
+'''
+        message = f"{text}\n{link}"
+        await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
+        await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in Science and Maths. I will send more of such events and activities your way if I find some! 🧮🔬🥼🤓")
     
     return ConversationHandler.END
 
@@ -273,7 +305,13 @@ async def coninformation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = query.from_user.id
     await query.answer()
     await query.edit_message_text(text = f"You have chosen {query.data}")
-    await context.bot.send_message(chat_id=user_id, text="Currently the specialist we are connecting you to is unavailable... tbc in figma")
+    if query.data == "unsure":
+        await context.bot.send_message(chat_id=user_id, text="Hi, My name is Danish. I am a General consultant from Youth Guidance Outreach Services (YGOS). According to the bot, You have are unsure of your own problems. Could you chat with me more so I can understand your situation better and assist you accordingly?")
+    elif query.data == "financial":
+        await context.bot.send_message(chat_id=user_id, text="Hi My name is Ashley, I am a Financial consultant from Life SG. I will try my best to help you with your problems. With that, please explain your problems")
+    elif query.data == "education":
+        print()
+    
     return ConversationHandler.END
 
 async def information(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -292,6 +330,21 @@ async def information(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     for location_url, location_text in location:
         text += f'<a href="{location_url}">{location_text}</a>\n'
     await context.bot.send_photo(chat_id=user_id, photo=image, caption=text, parse_mode= 'HTML' )
+
+async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
+    text: str = update.message.text
+
+    if  fi_user_1 in text:
+        await update.message.reply_text(fi_bot_1)
+    if fi_user_2 in text:
+        await update.message.reply_text(fi_bot_2)
+    if us_user_1 in text:
+        await update.message.reply_text(us_bot_1)
+    if us_user_2 in text:
+        await update.message.reply_text(us_bot_2)
+    if us_user_3 in text:
+        
 
 
 if __name__ == '__main__':
@@ -318,14 +371,14 @@ if __name__ == '__main__':
         states={
             FI_INFO:[CallbackQueryHandler(finformation, pattern= "^" + "<1500|1500-2499|2500-3499|3500-4499|4500-5500|>5500|not sure" + "$")],
             CA_INFO: [CallbackQueryHandler(actinformation, pattern= "^" + "sports|arts and crafts|science and math|games|tech" + "$")],
-            CONSULTATION: [CallbackQueryHandler(coninformation, pattern= "^" + "financial|personal|unsure" + "$")]
+            CONSULTATION: [CallbackQueryHandler(coninformation, pattern= "^" + "financial|personal|unsure|education" + "$")]
         },
         fallbacks=[CommandHandler("financial", finance)]
     )
 
     app.add_handler(profile_questions)
     app.add_handler(help_questions)
-
+    app.add_handler(MessageHandler(filters.TEXT, handle_response))
     #===============#
     print('Polling...')
     print(user_answers)
