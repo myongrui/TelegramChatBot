@@ -21,6 +21,21 @@ us_user_2 = "It's just this constant heaviness, you know? I can't shake off this
 us_user_3 = "It's like a weight on my chest, and I can't enjoy things like I used to. I think I started to notice this feeling few weeks back and now it's just on and off."
 us_bot_1 = "I appreciate you sharing that. I want you to know that I'm here for you, and we'll navigate this together. Can you tell me a bit more about what's been on your mind lately?"
 us_bot_2 = "It sounds like you're carrying a lot. Let’s try to unpack those feelings together. Can you describe what the heaviness feels like or when you first started noticing it?"
+ed_user_1 = "Sure thing. It's just everything, man – school, home, friends. Feels like I'm stuck in a whirlwind."
+ed_user_2 = "Math, bro. It's like a foreign language, and I'm just lost. Can't keep up with the assignments."
+ed_user_3 = "Yeah, that could work. Sick of feeling like the only one in the dark."
+ed_user_4 = "It's just me and my mom. She's grinding at work, and when she's home, it's like we're on different frequencies. Hardly talk."
+ed_user_5 = "Yeah, big time. But I don't wanna stress her out more, you know?"
+ed_bot_1 = "I get that vibe. Life can be like that. Let's kick off with school. Anything in particular making it a struggle?"
+ed_bot_2 = "Math can be a real headache. What if we find ways to make it less of a pain? Maybe some extra help or breaking down problems together?"
+ed_bot_3 = "You're not alone, man. We'll tackle it together. Now, home front – what's the scene there?"
+ed_bot_4 = "That's tough. Miss that connection with your mom?"
+ed_bot_5 = "I feel you. We'll find a way to balance it. What if we bring your mom into the convo, figure out some quality time?"
+mv_user_1= "Hey Melvin, I want learn more about MOE's merit bursary."
+mv_user_2 = "I'm currently studying in polytechnic"
+mv_bot_1 = "The Edusave Awards are typically given to recognize and reward students in Singapore for their academic achievements, good conduct, and special talents. These awards aim to motivate students to excel in their studies and contribute positively to the school community. May I inquire about your current education?"
+
+
 
 # Commands
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -310,7 +325,7 @@ async def coninformation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     elif query.data == "financial":
         await context.bot.send_message(chat_id=user_id, text="Hi My name is Ashley, I am a Financial consultant from Life SG. I will try my best to help you with your problems. With that, please explain your problems")
     elif query.data == "education":
-        print()
+        await context.bot.send_message(chat_id=user_id, text="Hi My name is Yunis, I am a Education and Career guidance counsellorr from Care SG. I will try my best to help you with your problems. With that, please explain your problems")
     
     return ConversationHandler.END
 
@@ -334,6 +349,8 @@ async def information(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     text: str = update.message.text
+    user_id = update.message.chat_id
+    appreciation = ["thx" , "thanks" , "ty" , "thank you"]
 
     if  fi_user_1 in text:
         await update.message.reply_text(fi_bot_1)
@@ -344,7 +361,41 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if us_user_2 in text:
         await update.message.reply_text(us_bot_2)
     if us_user_3 in text:
-        
+        print()
+    if ed_user_1 in text:
+        await update.message.reply_text(ed_bot_1)
+    if ed_user_2 in text:
+        await update.message.reply_text(ed_bot_2)
+    if ed_user_3 in text:
+        await update.message.reply_text(ed_bot_3)
+    if ed_user_4 in text:
+        await update.message.reply_text(ed_bot_4)
+    if ed_user_5 in text:
+        await update.message.reply_text(ed_bot_5)
+    if mv_user_1 in text:
+        await update.message.reply_text(mv_bot_1)
+    if mv_user_2 in text:
+        message = '''Here are the Edusave Awards for Polytechnic students!
+Edusave Skills Award
+Up to 10% of students from each course in the graduating cohort who have demonstrated excellent professional and soft skills throughout their course of study, and good conduct.
+
+Award amount:
+polytechnic: $500
+
+Edusave Merit Bursary (EMB)
+Students who are within the top 25% of their school’s level and course in terms of academic performance, have demonstrated good conduct and whose monthly household income does not exceed $7,500 (or per capita income does not exceed $1,875). Students must not be recipients of an Edusave Scholarship.
+
+Award amount:
+polytechnic: $500
+
+Edusave Good Progress Award (GPA)
+Students who are within the top 10% of their school’s level and course in terms of improvement in academic performance and have demonstrated good conduct.
+
+Award amount:
+polytechnic: $400'''
+        await context.bot.send_message(chat_id=user_id, text=message)
+    if text in appreciation:
+        await update.message.reply_text("No problem, always happy to help! ❤")
 
 
 if __name__ == '__main__':
