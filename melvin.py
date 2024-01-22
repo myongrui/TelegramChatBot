@@ -2,7 +2,7 @@ from typing import Final
 from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler, ConversationHandler
 
-token: Final = '6502869678:AAGkKEFOjyuYSR-liD9aUF-3B3NLQbcula0'
+token: Final = BOT_TOKEN
 bot_username: Final = '@Melvin_Cares_Bot'
 
 GENDER, AGE, EDUCATION, STATUS = range(4)
