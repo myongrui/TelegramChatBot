@@ -168,7 +168,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     await query.edit_message_text(text = f"You have chosen {query.data}")
     await context.bot.send_message(chat_id = user_id, text = '''Thanks for answering the questions! Data collected will only be used to curate the information we send you, nothing else. If at any time you need to update your profile, do /profile. All the best! 🙌🙌🙌''')
-    print(user_answers)
+    await context.bot.send_message(chat_id= user_id, text = "Before we dive into our chat, here's a quick heads-up! This chat is powered by an AI system designed to assist you. Our conversations may be used for training purposes to improve our responses. Rest assured, all data is anonymized and treated with the utmost privacy. By using this chat, you agree to these terms. \n Let's chat responsibly! 🤝😁")
     return ConversationHandler.END
 
 
@@ -310,7 +310,7 @@ With almost everything going digital, data is key to having a personalised servi
 '''
         message = f"{text}\n{link}"
         await context.bot.send_photo(chat_id=user_id, photo=image, caption=message, parse_mode= 'HTML' )
-        await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in Science and Maths. I will send more of such events and activities your way if I find some! 🧮🔬🥼🤓")
+        await context.bot.send_message(chat_id=user_id, text= "This is what I have so far. I have taken note that you are interested in software and tech. I will send more of such events and activities your way if I find some! 🖥👾🤖")
     
     return ConversationHandler.END
 
